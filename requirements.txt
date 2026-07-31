@@ -1,1 +1,6 @@
 streamlit
+streamlit-folium
+folium
+fpdf2
+pandas
+
