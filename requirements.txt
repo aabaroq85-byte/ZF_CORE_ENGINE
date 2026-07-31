@@ -1,6 +1,4 @@
 streamlit
-streamlit-folium
-folium
-fpdf2
+websocket-client
 pandas
-
+plotly
