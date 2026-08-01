@@ -1,8 +1,10 @@
 import streamlit as st
 import pandas as pd
+import time
+import random
 
 # -----------------------------------------------------------------------------
-# 1. KONFIGURASI HALAMAN & TEMA DARK KAKU (OPTIMAL UNTUK HP)
+# 1. KONFIGURASI HALAMAN & TEMA DARK KAKU
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="ZF MASTER CORE APP",
@@ -14,29 +16,24 @@ st.set_page_config(
 # Custom CSS Optimasi Layar HP & Laptop
 st.markdown("""
     <style>
-    /* Jarak atas disesuaikan agar header tidak terpotong tombol navigasi HP */
     .block-container {
         padding-top: 3.5rem !important;
         padding-bottom: 2rem !important;
         padding-left: 0.8rem !important;
         padding-right: 0.8rem !important;
     }
-    
-    /* Latar Belakang Utama Gelap */
     .stApp {
         background-color: #0E0E10;
         color: #E0E0E0;
         font-family: 'Inter', sans-serif;
     }
-    
-    /* Judul Utama */
     .main-header {
         font-size: 1.7rem;
         font-weight: 800;
         letter-spacing: 1px;
         color: #FFFFFF;
         text-align: center;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
         line-height: 1.2;
     }
     .neon-text {
@@ -47,10 +44,29 @@ st.markdown("""
         color: #8E8E93;
         text-align: center;
         margin-bottom: 18px;
-        line-height: 1.35;
     }
     
-    /* Modul Kartu Kaku */
+    /* Box Indikator Status Server */
+    .status-card {
+        background-color: #1A1A1E;
+        border: 1px solid #2C2C30;
+        border-radius: 10px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+    .status-dot {
+        height: 10px;
+        width: 10px;
+        background-color: #DEFF9A;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 8px #DEFF9A;
+    }
+    
+    /* Modul Kartu & Metric Kaku */
     .kaku-card {
         background-color: #1A1A1E;
         border: 1px solid #2C2C30;
@@ -58,42 +74,26 @@ st.markdown("""
         padding: 14px;
         margin-bottom: 10px;
     }
-    .card-title {
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: #FFFFFF;
-        margin-bottom: 4px;
-    }
-    .card-desc {
-        font-size: 0.78rem;
-        color: #A1A1A6;
-        line-height: 1.35;
-    }
-    
-    /* Kotak Angka Besar (Highlight) */
-    .big-number-box {
-        background: linear-gradient(135deg, #1A1A1E 0%, #121214 100%);
-        border: 1px solid #DEFF9A;
-        border-radius: 12px;
-        padding: 20px 10px;
-        text-align: center;
-        margin: 10px 0;
-    }
-    .big-number {
-        font-size: 2.8rem;
-        font-weight: 900;
-        color: #DEFF9A;
-        line-height: 1;
-    }
-    .big-number-sub {
+    .metric-label {
         font-size: 0.75rem;
         color: #8E8E93;
-        margin-top: 6px;
         text-transform: uppercase;
         letter-spacing: 0.8px;
     }
+    .metric-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        margin-top: 2px;
+    }
+    .metric-value-neon {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #DEFF9A;
+        margin-top: 2px;
+    }
     
-    /* Garis Pemisah Tipis */
+    /* Garis Pemisah */
     hr {
         border-color: #2C2C30;
         margin: 18px 0;
@@ -102,15 +102,79 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 2. HEADER UTAMA
+# 2. SIMULASI DATA REAL-TIME (STUB UNTUK METATRADER / API)
+# -----------------------------------------------------------------------------
+# Menggenerasi angka dinamis untuk mensimulasikan koneksi aktif
+base_balance = 10000.00
+floating_change = random.uniform(-45.0, 85.0)
+current_equity = base_balance + floating_change
+drawdown_pct = abs((floating_change / base_balance) * 100) if floating_change < 0 else 0.0
+
+# -----------------------------------------------------------------------------
+# 3. HEADER & STATUS CLOUD REAL-TIME
 # -----------------------------------------------------------------------------
 st.markdown('<div class="main-header">ZF MASTER <span class="neon-text">CORE APP</span></div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Arsitektur Fondasi Antarmuka Visual: Integrasi Monitoring Kaku & Kontrol Darurat Real-time untuk Dana Kelompok.</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Arsitektur Fondasi Antarmuka Visual & Monitoring Dana Real-time</div>', unsafe_allow_html=True)
+
+# Widget Indikator Status Server
+st.markdown(f"""
+    <div class="status-card">
+        <div>
+            <span style="font-weight: 700; font-size: 0.85rem; color: #FFF;">SERVER EA CLOUD</span><br>
+            <span style="font-size: 0.72rem; color: #8E8E93;">Metatrader 5 • Terminal #01</span>
+        </div>
+        <div>
+            <span class="status-dot"></span>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #DEFF9A; margin-left: 5px;">CONNECTED</span>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
+
+# -----------------------------------------------------------------------------
+# 4. METRIC DASBOR MONITORING REAL-TIME
+# -----------------------------------------------------------------------------
+st.markdown('<h4 style="font-weight: 700; margin-bottom: 12px;">Monitoring <span class="neon-text">Ekuitas Live</span></h4>', unsafe_allow_html=True)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown(f"""
+        <div class="kaku-card">
+            <div class="metric-label">Total Ekuitas</div>
+            <div class="metric-value-neon">${current_equity:,.2f}</div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown(f"""
+        <div class="kaku-card">
+            <div class="metric-label">Floating P/L</div>
+            <div class="metric-value" style="color: {'#DEFF9A' if floating_change >= 0 else '#FF5252'};">
+                {'+' if floating_change >= 0 else ''}${floating_change:,.2f}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown(f"""
+        <div class="kaku-card">
+            <div class="metric-label">Balance Awal</div>
+            <div class="metric-value">${base_balance:,.2f}</div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown(f"""
+        <div class="kaku-card">
+            <div class="metric-label">Drawdown Saat Ini</div>
+            <div class="metric-value" style="color: {'#DEFF9A' if drawdown_pct < 1.0 else '#FF5252'};">
+                {drawdown_pct:.2f}% <span style="font-size: 0.75rem; color: #8E8E93;">/ Max 1.5%</span>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
-# 3. SEKSI PRINSIP DESAIN KAKU
+# 5. DOKUMENTASI PRINSIP DESAIN & SPESIFIKASI
 # -----------------------------------------------------------------------------
 st.markdown('<h4 style="text-align: center; font-weight: 700; margin-bottom: 12px;">Prinsip Desain <span class="neon-text">Kaku</span></h4>', unsafe_allow_html=True)
 
@@ -119,75 +183,19 @@ col_a, col_b = st.columns(2)
 with col_a:
     st.markdown("""
         <div class="kaku-card">
-            <div class="card-title">Minimalis & Terarah</div>
-            <div class="card-desc">Menghilangkan distraksi grafik rumit. Fokus hanya pada angka Ekuitas dan status keamanan robot di server cloud.</div>
-        </div>
-        <div class="kaku-card">
-            <div class="card-title">Aksesibilitas Awam</div>
-            <div class="card-desc">Penggunaan bahasa yang tidak teknis. Mengubah istilah "Margin Call" menjadi "Batas Risiko" agar mudah dipahami anggota.</div>
+            <div class="card-title" style="color: #FFF; font-size: 0.9rem; font-weight: 700;">Minimalis & Terarah</div>
+            <div class="card-desc" style="color: #A1A1A6; font-size: 0.78rem;">Fokus utama pada pergerakan Ekuitas dan proteksi risiko tanpa distraksi indikator teknis berlebih.</div>
         </div>
     """, unsafe_allow_html=True)
 
 with col_b:
     st.markdown("""
         <div class="kaku-card">
-            <div class="card-title">Hierarki Kontrol</div>
-            <div class="card-desc">Informasi kritis (Minus %) diletakkan di tengah dengan kontras tertinggi agar saudara Aa langsung waspada jika terjadi drawdown.</div>
-        </div>
-        <div class="kaku-card">
-            <div class="card-title">Keamanan Visual</div>
-            <div class="card-desc">Mode gelap (Dark Mode) untuk mengurangi kelelahan mata saat pemantauan 24 jam dan meningkatkan visibilitas aksen neon.</div>
+            <div class="card-title" style="color: #FFF; font-size: 0.9rem; font-weight: 700;">Batas Risiko Kaku</div>
+            <div class="card-desc" style="color: #A1A1A6; font-size: 0.78rem;">Sistem otomatis memproteksi modal jika persentase drawdown mendekati ambang batas 1.5%.</div>
         </div>
     """, unsafe_allow_html=True)
 
-st.markdown("---")
-
-# -----------------------------------------------------------------------------
-# 4. SEKSI BATAS RISIKO & EFISIENSI
-# -----------------------------------------------------------------------------
-col_left, col_right = st.columns([1, 1.2])
-
-with col_left:
-    st.markdown('<h4 style="font-weight: 700; margin-bottom: 10px;">Batas <span class="neon-text">Risiko Kaku</span></h4>', unsafe_allow_html=True)
-    st.markdown("""
-        <div class="big-number-box">
-            <div class="big-number">1.5%</div>
-            <div class="big-number-sub">Per Sesi Trading (Proteksi Mutlak)</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-with col_right:
-    st.markdown('<h4 style="font-weight: 700; margin-bottom: 10px;">Efisiensi <span class="neon-text">Monitoring</span></h4>', unsafe_allow_html=True)
-    st.markdown("""
-        <div class="kaku-card">
-            <div class="card-title">⏱️ Respon App: <span class="neon-text">0.5 Detik</span></div>
-            <div class="card-desc">Menghilangkan faktor 'keraguan manusia' saat harus menutup posisi dalam kondisi pasar ekstrem.</div>
-        </div>
-        <div class="kaku-card">
-            <div class="card-title">🛡️ Keamanan Utama</div>
-            <div class="card-desc">Instrumen perlindungan modal kelompok yang menjaga setiap sen dari risiko tidak terukur.</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("---")
-
-# -----------------------------------------------------------------------------
-# 5. SPESIFIKASI TEKNIS UI
-# -----------------------------------------------------------------------------
-st.markdown('<h4 style="font-weight: 700; margin-bottom: 10px;">Spesifikasi <span class="neon-text">Teknis UI</span></h4>', unsafe_allow_html=True)
-
-data_spec = {
-    "Komponen": ["Library UI", "Font Style", "Aksen Warna", "Update Rate"],
-    "Teknologi / Nilai": ["Streamlit / Custom CSS", "Urbanist / Inter", "#DEFF9A (Neon Green)", "1000ms (1 Detik)"],
-    "Fungsi Utama": [
-        "Antarmuka modern & responsif di HP",
-        "Keterbacaan angka finansial tinggi",
-        "Identitas 'Status Aktif & Profit'",
-        "Sinkronisasi presisi data bursa"
-    ]
-}
-
-df_spec = pd.DataFrame(data_spec)
-st.dataframe(df_spec, use_container_width=True, hide_index=True)
-
-st.markdown("<br><p style='text-align: center; color: #8E8E93; font-size: 0.75rem;'>ZF Master Core App • Keamanan Prioritas Utama</p>", unsafe_allow_html=True)
+# Refresh otomatis setiap 3 detik untuk mensimulasikan data live
+time.sleep(3)
+st.rerun()
