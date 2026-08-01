@@ -80,17 +80,43 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 0.8px;
     }
+    .metric-value-neon {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #DEFF9A;
+        margin-top: 2px;
+    }
     .metric-value {
         font-size: 1.6rem;
         font-weight: 800;
         color: #FFFFFF;
         margin-top: 2px;
     }
-    .metric-value-neon {
-        font-size: 1.6rem;
-        font-weight: 800;
-        color: #DEFF9A;
-        margin-top: 2px;
+    
+    /* Styling Khusus Modul Darurat / Emergency */
+    .emergency-card {
+        background-color: #1E1213;
+        border: 1px solid #5A1E22;
+        border-radius: 10px;
+        padding: 16px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+    
+    /* Custom Styling Tombol Streamlit Merah Kaku */
+    div.stButton > button:first-child {
+        background-color: #D32F2F !important;
+        color: #FFFFFF !important;
+        font-weight: 800 !important;
+        letter-spacing: 1px !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 12px 20px !important;
+        width: 100% !important;
+    }
+    div.stButton > button:first-child:hover {
+        background-color: #B71C1C !important;
+        box-shadow: 0 0 10px #D32F2F !important;
     }
     
     /* Garis Pemisah */
@@ -102,21 +128,32 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 2. SIMULASI DATA REAL-TIME (STUB UNTUK METATRADER / API)
+# 2. STATE APPLIKASI & SIMULASI DATA
 # -----------------------------------------------------------------------------
-# Menggenerasi angka dinamis untuk mensimulasikan koneksi aktif
+if 'emergency_triggered' not in st_state:
+    st.session_state['emergency_triggered'] = False
+
 base_balance = 10000.00
-floating_change = random.uniform(-45.0, 85.0)
-current_equity = base_balance + floating_change
-drawdown_pct = abs((floating_change / base_balance) * 100) if floating_change < 0 else 0.0
+
+if not st.session_state['emergency_triggered']:
+    floating_change = random.uniform(-45.0, 85.0)
+    current_equity = base_balance + floating_change
+    drawdown_pct = abs((floating_change / base_balance) * 100) if floating_change < 0 else 0.0
+else:
+    floating_change = 0.0
+    current_equity = base_balance
+    drawdown_pct = 0.0
 
 # -----------------------------------------------------------------------------
-# 3. HEADER & STATUS CLOUD REAL-TIME
+# 3. HEADER & STATUS CLOUD
 # -----------------------------------------------------------------------------
 st.markdown('<div class="main-header">ZF MASTER <span class="neon-text">CORE APP</span></div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Arsitektur Fondasi Antarmuka Visual & Monitoring Dana Real-time</div>', unsafe_allow_html=True)
 
-# Widget Indikator Status Server
+# Status Server
+status_color = "#DEFF9A" if not st.session_state['emergency_triggered'] else "#FF5252"
+status_text = "CONNECTED" if not st.session_state['emergency_triggered'] else "EMERGENCY CUT-OFF"
+
 st.markdown(f"""
     <div class="status-card">
         <div>
@@ -124,14 +161,14 @@ st.markdown(f"""
             <span style="font-size: 0.72rem; color: #8E8E93;">Metatrader 5 • Terminal #01</span>
         </div>
         <div>
-            <span class="status-dot"></span>
-            <span style="font-size: 0.8rem; font-weight: 700; color: #DEFF9A; margin-left: 5px;">CONNECTED</span>
+            <span class="status-dot" style="background-color: {status_color}; box-shadow: 0 0 8px {status_color};"></span>
+            <span style="font-size: 0.8rem; font-weight: 700; color: {status_color}; margin-left: 5px;">{status_text}</span>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 4. METRIC DASBOR MONITORING REAL-TIME
+# 4. MONITORING DANA LIVE
 # -----------------------------------------------------------------------------
 st.markdown('<h4 style="font-weight: 700; margin-bottom: 12px;">Monitoring <span class="neon-text">Ekuitas Live</span></h4>', unsafe_allow_html=True)
 
@@ -174,28 +211,34 @@ with col2:
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
-# 5. DOKUMENTASI PRINSIP DESAIN & SPESIFIKASI
+# 5. MODUL KONTROL DARURAT (PANIC CUT-OFF)
 # -----------------------------------------------------------------------------
-st.markdown('<h4 style="text-align: center; font-weight: 700; margin-bottom: 12px;">Prinsip Desain <span class="neon-text">Kaku</span></h4>', unsafe_allow_html=True)
+st.markdown('<h4 style="font-weight: 700; color: #FF5252; margin-bottom: 12px;">🚨 Modul Kontrol Darurat</h4>', unsafe_allow_html=True)
 
-col_a, col_b = st.columns(2)
-
-with col_a:
-    st.markdown("""
-        <div class="kaku-card">
-            <div class="card-title" style="color: #FFF; font-size: 0.9rem; font-weight: 700;">Minimalis & Terarah</div>
-            <div class="card-desc" style="color: #A1A1A6; font-size: 0.78rem;">Fokus utama pada pergerakan Ekuitas dan proteksi risiko tanpa distraksi indikator teknis berlebih.</div>
+st.markdown("""
+    <div class="emergency-card">
+        <div style="font-weight: 700; color: #FF5252; font-size: 0.95rem; margin-bottom: 4px;">PROTEKSI MUTLAK DANA KELOMPOK</div>
+        <div style="color: #A1A1A6; font-size: 0.78rem; line-height: 1.35;">
+            Gunakan tombol di bawah untuk menutup seluruh posisi trading aktif secara instan dan mematikan perintah EA di server cloud.
         </div>
-    """, unsafe_allow_html=True)
+    </div>
+""", unsafe_allow_html=True)
 
-with col_b:
-    st.markdown("""
-        <div class="kaku-card">
-            <div class="card-title" style="color: #FFF; font-size: 0.9rem; font-weight: 700;">Batas Risiko Kaku</div>
-            <div class="card-desc" style="color: #A1A1A6; font-size: 0.78rem;">Sistem otomatis memproteksi modal jika persentase drawdown mendekati ambang batas 1.5%.</div>
-        </div>
-    """, unsafe_allow_html=True)
+pin_input = st.text_input("Masukkan PIN Otorisasi (Default PIN: 8888)", type="password", key="pin_code")
 
-# Refresh otomatis setiap 3 detik untuk mensimulasikan data live
-time.sleep(3)
-st.rerun()
+if st.button("🚨 CLOSE ALL POSITIONS (PANIC CUT-OFF)"):
+    if pin_input == "8888":
+        st.session_state['emergency_triggered'] = True
+        st.error("⚠️ PERINTAH DARURAT DIKESEKUSI! Seluruh posisi trading telah ditutup mutlak.")
+    else:
+        st.warning("❌ PIN Otorisasi Salah! Akses ditolak.")
+
+if st.session_state['emergency_triggered']:
+    if st.button("🔄 RESET SISTEM MONITORING (NORMAL)"):
+        st.session_state['emergency_triggered'] = False
+        st.experimental_rerun()
+
+# Auto-refresh interval (jika kondisi normal)
+if not st.session_state['emergency_triggered']:
+    time.sleep(3)
+    st.rerun()
