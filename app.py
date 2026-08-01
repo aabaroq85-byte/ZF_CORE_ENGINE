@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # -----------------------------------------------------------------------------
-# 1. KONFIGURASI HALAMAN & TEMA DARK KAKU (DIPADATKAN UNTUK HP)
+# 1. KONFIGURASI HALAMAN & TEMA DARK KAKU (OPTIMAL UNTUK HP)
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="ZF MASTER CORE APP",
@@ -11,18 +11,18 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS Optimasi Layar HP (Aksen Neon #DEFF9A)
+# Custom CSS Optimasi Layar HP & Laptop
 st.markdown("""
     <style>
-    /* Kurangi padding atas & samping bawaan Streamlit agar pas di HP */
+    /* Jarak atas disesuaikan agar header tidak terpotong tombol navigasi HP */
     .block-container {
-        padding-top: 1.5rem !important;
+        padding-top: 3.5rem !important;
         padding-bottom: 2rem !important;
         padding-left: 0.8rem !important;
         padding-right: 0.8rem !important;
     }
     
-    /* Latar Belakang Utama */
+    /* Latar Belakang Utama Gelap */
     .stApp {
         background-color: #0E0E10;
         color: #E0E0E0;
@@ -36,7 +36,7 @@ st.markdown("""
         letter-spacing: 1px;
         color: #FFFFFF;
         text-align: center;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
         line-height: 1.2;
     }
     .neon-text {
