@@ -1,104 +1,108 @@
 import streamlit as st
 import pandas as pd
-import time
-import math
 
 # -----------------------------------------------------------------------------
-# 1. KONFIGURASI HALAMAN & TEMA DARK KAKU
+# 1. KONFIGURASI HALAMAN & TEMA DARK KAKU (DIPADATKAN UNTUK HP)
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="ZF MASTER CORE APP",
     page_icon="⚡",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Custom CSS untuk Meniru Gaya Visual Dokumen (Dark Mode + Hijau Neon #DEFF9A)
+# Custom CSS Optimasi Layar HP (Aksen Neon #DEFF9A)
 st.markdown("""
     <style>
-    /* Background Utama & Font */
+    /* Kurangi padding atas & samping bawaan Streamlit agar pas di HP */
+    .block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: 0.8rem !important;
+        padding-right: 0.8rem !important;
+    }
+    
+    /* Latar Belakang Utama */
     .stApp {
         background-color: #0E0E10;
         color: #E0E0E0;
         font-family: 'Inter', sans-serif;
     }
     
-    /* Judul Utama dengan Akson Neon Green */
+    /* Judul Utama */
     .main-header {
-        font-size: 2.2rem;
+        font-size: 1.7rem;
         font-weight: 800;
-        letter-spacing: 1.5px;
+        letter-spacing: 1px;
         color: #FFFFFF;
         text-align: center;
-        margin-bottom: 5px;
+        margin-bottom: 4px;
+        line-height: 1.2;
     }
     .neon-text {
         color: #DEFF9A;
     }
     .sub-header {
-        font-size: 0.9rem;
+        font-size: 0.78rem;
         color: #8E8E93;
         text-align: center;
-        margin-bottom: 25px;
+        margin-bottom: 18px;
+        line-height: 1.35;
     }
     
-    /* Kartu / Box Fitur Kaku (Prinsip Desain Kaku) */
+    /* Modul Kartu Kaku */
     .kaku-card {
         background-color: #1A1A1E;
         border: 1px solid #2C2C30;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 15px;
-        transition: border 0.3s ease;
-    }
-    .kaku-card:hover {
-        border: 1px solid #DEFF9A;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 10px;
     }
     .card-title {
-        font-size: 1.1rem;
+        font-size: 0.95rem;
         font-weight: 700;
         color: #FFFFFF;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
     }
     .card-desc {
-        font-size: 0.85rem;
+        font-size: 0.78rem;
         color: #A1A1A6;
-        line-height: 1.4;
+        line-height: 1.35;
     }
     
-    /* Stat / Highlight Angka Besar */
+    /* Kotak Angka Besar (Highlight) */
     .big-number-box {
         background: linear-gradient(135deg, #1A1A1E 0%, #121214 100%);
         border: 1px solid #DEFF9A;
-        border-radius: 16px;
-        padding: 30px;
+        border-radius: 12px;
+        padding: 20px 10px;
         text-align: center;
-        margin: 20px 0;
+        margin: 10px 0;
     }
     .big-number {
-        font-size: 3.5rem;
+        font-size: 2.8rem;
         font-weight: 900;
         color: #DEFF9A;
         line-height: 1;
     }
     .big-number-sub {
-        font-size: 0.9rem;
+        font-size: 0.75rem;
         color: #8E8E93;
-        margin-top: 10px;
+        margin-top: 6px;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.8px;
     }
     
-    /* Garis Pemisah (Divider) */
+    /* Garis Pemisah Tipis */
     hr {
         border-color: #2C2C30;
-        margin: 30px 0;
+        margin: 18px 0;
     }
     </style>
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 2. HEADER UTAMA (ZF MASTER CORE APP)
+# 2. HEADER UTAMA
 # -----------------------------------------------------------------------------
 st.markdown('<div class="main-header">ZF MASTER <span class="neon-text">CORE APP</span></div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Arsitektur Fondasi Antarmuka Visual: Integrasi Monitoring Kaku & Kontrol Darurat Real-time untuk Dana Kelompok.</div>', unsafe_allow_html=True)
@@ -106,10 +110,9 @@ st.markdown('<div class="sub-header">Arsitektur Fondasi Antarmuka Visual: Integr
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
-# 3. SEKSI VISI & ARSITEKTUR (PRINSIP DESAIN KAKU)
+# 3. SEKSI PRINSIP DESAIN KAKU
 # -----------------------------------------------------------------------------
-st.markdown('<h3 style="text-align: center; font-weight: 700;">Prinsip Desain <span class="neon-text">Kaku</span></h3>', unsafe_allow_html=True)
-st.write("")
+st.markdown('<h4 style="text-align: center; font-weight: 700; margin-bottom: 12px;">Prinsip Desain <span class="neon-text">Kaku</span></h4>', unsafe_allow_html=True)
 
 col_a, col_b = st.columns(2)
 
@@ -140,12 +143,12 @@ with col_b:
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
-# 4. SEKSI BATAS RISIKO KAKU & PILAR NAVIGASI
+# 4. SEKSI BATAS RISIKO & EFISIENSI
 # -----------------------------------------------------------------------------
 col_left, col_right = st.columns([1, 1.2])
 
 with col_left:
-    st.markdown('<h3 style="font-weight: 700;">Batas <span class="neon-text">Risiko Kaku</span></h3>', unsafe_allow_html=True)
+    st.markdown('<h4 style="font-weight: 700; margin-bottom: 10px;">Batas <span class="neon-text">Risiko Kaku</span></h4>', unsafe_allow_html=True)
     st.markdown("""
         <div class="big-number-box">
             <div class="big-number">1.5%</div>
@@ -154,28 +157,28 @@ with col_left:
     """, unsafe_allow_html=True)
 
 with col_right:
-    st.markdown('<h3 style="font-weight: 700;">Efisiensi <span class="neon-text">Monitoring</span></h3>', unsafe_allow_html=True)
+    st.markdown('<h4 style="font-weight: 700; margin-bottom: 10px;">Efisiensi <span class="neon-text">Monitoring</span></h4>', unsafe_allow_html=True)
     st.markdown("""
         <div class="kaku-card">
-            <div class="card-title">⏱️ Respon App (Otomatis): <span class="neon-text">0.5 Detik</span></div>
+            <div class="card-title">⏱️ Respon App: <span class="neon-text">0.5 Detik</span></div>
             <div class="card-desc">Menghilangkan faktor 'keraguan manusia' saat harus menutup posisi dalam kondisi pasar ekstrem.</div>
         </div>
         <div class="kaku-card">
-            <div class="card-title">🛡️ Keamanan Prioritas Utama</div>
-            <div class="card-desc">Bukan sekadar aplikasi trading, melainkan instrumen perlindungan modal kelompok yang menjaga setiap sen dari risiko yang tidak terukur.</div>
+            <div class="card-title">🛡️ Keamanan Utama</div>
+            <div class="card-desc">Instrumen perlindungan modal kelompok yang menjaga setiap sen dari risiko tidak terukur.</div>
         </div>
     """, unsafe_allow_html=True)
 
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
-# 5. SPESIFIKASI TEKNIS UI (TABEL STYLED)
+# 5. SPESIFIKASI TEKNIS UI
 # -----------------------------------------------------------------------------
-st.markdown('<h3 style="font-weight: 700;">Spesifikasi <span class="neon-text">Teknis UI</span></h3>', unsafe_allow_html=True)
+st.markdown('<h4 style="font-weight: 700; margin-bottom: 10px;">Spesifikasi <span class="neon-text">Teknis UI</span></h4>', unsafe_allow_html=True)
 
 data_spec = {
     "Komponen": ["Library UI", "Font Style", "Aksen Warna", "Update Rate"],
-    "Teknologi / Nilai": ["Streamlit / Custom CSS", "Urbanist / Inter (Sans-Serif)", "#DEFF9A (Neon Green)", "1000ms (1 Detik)"],
+    "Teknologi / Nilai": ["Streamlit / Custom CSS", "Urbanist / Inter", "#DEFF9A (Neon Green)", "1000ms (1 Detik)"],
     "Fungsi Utama": [
         "Antarmuka modern & responsif di HP",
         "Keterbacaan angka finansial tinggi",
@@ -187,5 +190,4 @@ data_spec = {
 df_spec = pd.DataFrame(data_spec)
 st.dataframe(df_spec, use_container_width=True, hide_index=True)
 
-# Footer Presentasi
-st.markdown("<br><p style='text-align: center; color: #8E8E93; font-size: 0.8rem;'>ZF Master Core App • Keamanan Prioritas Utama</p>", unsafe_allow_html=True)
+st.markdown("<br><p style='text-align: center; color: #8E8E93; font-size: 0.75rem;'>ZF Master Core App • Keamanan Prioritas Utama</p>", unsafe_allow_html=True)
