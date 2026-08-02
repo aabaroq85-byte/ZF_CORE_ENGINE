@@ -148,16 +148,28 @@ def send_telegram_alert(token, chat_id, message):
         return False
 
 # -----------------------------------------------------------------------------
-# 3. INISIALISASI STATE & SIMULASI DATA
+# 3. INISIALISASI STATE, AUDIT LOG & SIMULASI DATA
 # -----------------------------------------------------------------------------
 if 'emergency_triggered' not in st.session_state:
     st.session_state['emergency_triggered'] = False
+
+if 'audit_logs' not in st.session_state:
+    st.session_state['audit_logs'] = [
+        {"Waktu": datetime.now().strftime('%H:%M:%S'), "Event": "SYS_INIT", "Level": "INFO", "Rincian": "Inisialisasi Server Cloud EA MT5 Terminal #01"},
+        {"Waktu": datetime.now().strftime('%H:%M:%S'), "Event": "RISK_CHECK", "Level": "NORMAL", "Rincian": "Sistem monitoring aktif, Max DD limit set 1.5%"}
+    ]
 
 if 'dd_history' not in st.session_state:
     st.session_state['dd_history'] = pd.DataFrame({
         'Waktu': [datetime.now().strftime('%H:%M:%S') for _ in range(10)],
         'Drawdown (%)': [round(random.uniform(0.0, 0.4), 2) for _ in range(10)]
     })
+
+def add_log(event, level, detail):
+    new_log = {"Waktu": datetime.now().strftime('%H:%M:%S'), "Event": event, "Level": level, "Rincian": detail}
+    st.session_state['audit_logs'].insert(0, new_log)
+    if len(st.session_state['audit_logs']) > 20:
+        st.session_state['audit_logs'].pop()
 
 base_balance = 10000.00
 
@@ -275,7 +287,8 @@ if st.button("🚨 CLOSE ALL POSITIONS (PANIC CUT-OFF)"):
         st.session_state['emergency_triggered'] = True
         st.error("⚠️ PERINTAH DARURAT DIEKSEKUSI! Seluruh posisi trading telah ditutup mutlak.")
         
-        # Kirim Notifikasi Telegram Otomatis
+        add_log("PANIC_TRIGGER", "CRITICAL", f"Cut-off dieksekusi! Equity: ${current_equity:,.2f}")
+        
         msg = (
             "🚨 *[EMERGENCY ALERT] ZF MASTER CORE APP*\n\n"
             "⚠️ *PANIC CUT-OFF DIEKSEKUSI MANUSIA!*\n"
@@ -286,8 +299,9 @@ if st.button("🚨 CLOSE ALL POSITIONS (PANIC CUT-OFF)"):
         )
         if send_telegram_alert(bot_token, chat_id, msg):
             st.success("📲 Notifikasi Darurat Berhasil Terkirim ke Telegram!")
+            add_log("TG_ALERT", "SUCCESS", "Pesan darurat berhasil terkirim ke Telegram")
         else:
-            st.info("ℹ️ Notifikasi Telegram tidak terkirim (Token / Chat ID belum diisi).")
+            add_log("TG_ALERT", "WARNING", "Gagal/Tidak mengirim Telegram (Token belum diset)")
             
     else:
         st.warning("❌ PIN Otorisasi Salah! Akses ditolak.")
@@ -295,7 +309,19 @@ if st.button("🚨 CLOSE ALL POSITIONS (PANIC CUT-OFF)"):
 if st.session_state['emergency_triggered']:
     if st.button("🔄 RESET SISTEM MONITORING (NORMAL)"):
         st.session_state['emergency_triggered'] = False
+        add_log("SYS_RESET", "INFO", "Sistem dipulihkan ke mode normal")
         st.rerun()
+
+st.markdown("---")
+
+# -----------------------------------------------------------------------------
+# 8. MODUL TABEL LOG AKTIVITAS (AUDIT TRAIL LOG)
+# -----------------------------------------------------------------------------
+st.markdown('<h4 style="font-weight: 700; margin-bottom: 8px;">📋 Tabel <span class="neon-text">Audit Trail Log</span></h4>', unsafe_allow_html=True)
+st.markdown('<div style="color: #8E8E93; font-size: 0.75rem; margin-bottom: 12px;">Riwayat otomatis aktivitas sistem & pengawasan dana real-time.</div>', unsafe_allow_html=True)
+
+df_logs = pd.DataFrame(st.session_state['audit_logs'])
+st.dataframe(df_logs, use_container_width=True, hide_index=True)
 
 # Auto-refresh interval (3 detik jika normal)
 if not st.session_state['emergency_triggered']:
