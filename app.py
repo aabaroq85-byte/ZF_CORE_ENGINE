@@ -6,7 +6,7 @@ import random
 from datetime import datetime
 
 # -----------------------------------------------------------------------------
-# 1. KONFIGURASI HALAMAN & TEMA DARK KAKU
+# 1. KONFIGURASI HALAMAN & TEMA DARK HIGH-CONTRAST (HP OPTIMIZED)
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="ZF MASTER CORE APP",
@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS Optimasi Layar HP & Laptop
+# Custom CSS Optimasi Kontras & Layar HP
 st.markdown("""
     <style>
     .block-container {
@@ -46,6 +46,30 @@ st.markdown("""
         color: #8E8E93;
         text-align: center;
         margin-bottom: 18px;
+    }
+    
+    /* Perbaikan Kontras Expander & Label Form agar Jelas di HP */
+    div[data-testid="stExpander"] {
+        background-color: #1A1A1E !important;
+        border: 1px solid #2C2C30 !important;
+        border-radius: 8px !important;
+    }
+    div[data-testid="stExpander"] details summary span {
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+    }
+    label[data-testid="stWidgetLabel"] p {
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+    }
+    div[data-baseweb="input"] {
+        background-color: #242429 !important;
+        border: 1px solid #3A3A40 !important;
+        border-radius: 6px !important;
+    }
+    div[data-baseweb="input"] input {
+        color: #FFFFFF !important;
     }
     
     /* Box Indikator Status Server */
