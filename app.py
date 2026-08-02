@@ -1,7 +1,9 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import time
 import random
+from datetime import datetime
 
 # -----------------------------------------------------------------------------
 # 1. KONFIGURASI HALAMAN & TEMA DARK KAKU
@@ -93,7 +95,7 @@ st.markdown("""
         margin-top: 2px;
     }
     
-    /* Styling Khusus Modul Darurat / Emergency */
+    /* Styling Khusus Modul Darurat */
     .emergency-card {
         background-color: #1E1213;
         border: 1px solid #5A1E22;
@@ -103,7 +105,7 @@ st.markdown("""
         margin-bottom: 15px;
     }
     
-    /* Custom Styling Tombol Streamlit Merah Kaku */
+    /* Custom Styling Tombol Merah */
     div.stButton > button:first-child {
         background-color: #D32F2F !important;
         color: #FFFFFF !important;
@@ -128,10 +130,17 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 2. STATE APLIKASI & SIMULASI DATA
+# 2. INISIALISASI STATE & RIWAYAT GRAFIK
 # -----------------------------------------------------------------------------
 if 'emergency_triggered' not in st.session_state:
     st.session_state['emergency_triggered'] = False
+
+if 'dd_history' not in st.session_state:
+    # Inisialisasi awal 10 data poin simulasi
+    st.session_state['dd_history'] = pd.DataFrame({
+        'Waktu': [datetime.now().strftime('%H:%M:%S') for _ in range(10)],
+        'Drawdown (%)': [round(random.uniform(0.0, 0.4), 2) for _ in range(10)]
+    })
 
 base_balance = 10000.00
 
@@ -139,6 +148,13 @@ if not st.session_state['emergency_triggered']:
     floating_change = random.uniform(-45.0, 85.0)
     current_equity = base_balance + floating_change
     drawdown_pct = abs((floating_change / base_balance) * 100) if floating_change < 0 else 0.0
+    
+    # Update riwayat grafik
+    new_entry = pd.DataFrame({
+        'Waktu': [datetime.now().strftime('%H:%M:%S')],
+        'Drawdown (%)': [round(drawdown_pct, 2)]
+    })
+    st.session_state['dd_history'] = pd.concat([st.session_state['dd_history'], new_entry]).tail(15)
 else:
     floating_change = 0.0
     current_equity = base_balance
@@ -150,7 +166,6 @@ else:
 st.markdown('<div class="main-header">ZF MASTER <span class="neon-text">CORE APP</span></div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Arsitektur Fondasi Antarmuka Visual & Monitoring Dana Real-time</div>', unsafe_allow_html=True)
 
-# Status Server
 status_color = "#DEFF9A" if not st.session_state['emergency_triggered'] else "#FF5252"
 status_text = "CONNECTED" if not st.session_state['emergency_triggered'] else "EMERGENCY CUT-OFF"
 
@@ -211,7 +226,19 @@ with col2:
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
-# 5. MODUL KONTROL DARURAT (PANIC CUT-OFF)
+# 5. MODUL GRAFIK AREA DRAWDOWN (OPSI A)
+# -----------------------------------------------------------------------------
+st.markdown('<h4 style="font-weight: 700; margin-bottom: 8px;">📉 Fluktuasi <span class="neon-text">Drawdown Real-Time</span></h4>', unsafe_allow_html=True)
+st.markdown('<div style="color: #8E8E93; font-size: 0.75rem; margin-bottom: 12px;">Monitoring grafik tren risiko batas maksimal 1.5%.</div>', unsafe_allow_html=True)
+
+# Tampilkan Area Chart Streamlit
+chart_data = st.session_state['dd_history'].set_index('Waktu')
+st.area_chart(chart_data, color="#DEFF9A" if not st.session_state['emergency_triggered'] else "#FF5252")
+
+st.markdown("---")
+
+# -----------------------------------------------------------------------------
+# 6. MODUL KONTROL DARURAT
 # -----------------------------------------------------------------------------
 st.markdown('<h4 style="font-weight: 700; color: #FF5252; margin-bottom: 12px;">🚨 Modul Kontrol Darurat</h4>', unsafe_allow_html=True)
 
@@ -238,7 +265,7 @@ if st.session_state['emergency_triggered']:
         st.session_state['emergency_triggered'] = False
         st.rerun()
 
-# Auto-refresh interval (jika kondisi normal)
+# Auto-refresh interval (3 detik jika normal)
 if not st.session_state['emergency_triggered']:
     time.sleep(3)
     st.rerun()
