@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+import requests
 import time
 import random
 from datetime import datetime
@@ -130,13 +130,30 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 2. INISIALISASI STATE & RIWAYAT GRAFIK
+# 2. FUNGSI KIRIM NOTIFIKASI TELEGRAM
+# -----------------------------------------------------------------------------
+def send_telegram_alert(token, chat_id, message):
+    if not token or not chat_id:
+        return False
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "Markdown"
+    }
+    try:
+        res = requests.post(url, json=payload, timeout=5)
+        return res.status_code == 200
+    except Exception:
+        return False
+
+# -----------------------------------------------------------------------------
+# 3. INISIALISASI STATE & SIMULASI DATA
 # -----------------------------------------------------------------------------
 if 'emergency_triggered' not in st.session_state:
     st.session_state['emergency_triggered'] = False
 
 if 'dd_history' not in st.session_state:
-    # Inisialisasi awal 10 data poin simulasi
     st.session_state['dd_history'] = pd.DataFrame({
         'Waktu': [datetime.now().strftime('%H:%M:%S') for _ in range(10)],
         'Drawdown (%)': [round(random.uniform(0.0, 0.4), 2) for _ in range(10)]
@@ -149,7 +166,6 @@ if not st.session_state['emergency_triggered']:
     current_equity = base_balance + floating_change
     drawdown_pct = abs((floating_change / base_balance) * 100) if floating_change < 0 else 0.0
     
-    # Update riwayat grafik
     new_entry = pd.DataFrame({
         'Waktu': [datetime.now().strftime('%H:%M:%S')],
         'Drawdown (%)': [round(drawdown_pct, 2)]
@@ -161,7 +177,7 @@ else:
     drawdown_pct = 0.0
 
 # -----------------------------------------------------------------------------
-# 3. HEADER & STATUS CLOUD
+# 4. HEADER & STATUS CLOUD
 # -----------------------------------------------------------------------------
 st.markdown('<div class="main-header">ZF MASTER <span class="neon-text">CORE APP</span></div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Arsitektur Fondasi Antarmuka Visual & Monitoring Dana Real-time</div>', unsafe_allow_html=True)
@@ -183,7 +199,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 4. MONITORING DANA LIVE
+# 5. MONITORING DANA LIVE
 # -----------------------------------------------------------------------------
 st.markdown('<h4 style="font-weight: 700; margin-bottom: 12px;">Monitoring <span class="neon-text">Ekuitas Live</span></h4>', unsafe_allow_html=True)
 
@@ -226,21 +242,22 @@ with col2:
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
-# 5. MODUL GRAFIK AREA DRAWDOWN (OPSI A)
+# 6. MODUL GRAFIK AREA DRAWDOWN
 # -----------------------------------------------------------------------------
 st.markdown('<h4 style="font-weight: 700; margin-bottom: 8px;">📉 Fluktuasi <span class="neon-text">Drawdown Real-Time</span></h4>', unsafe_allow_html=True)
-st.markdown('<div style="color: #8E8E93; font-size: 0.75rem; margin-bottom: 12px;">Monitoring grafik tren risiko batas maksimal 1.5%.</div>', unsafe_allow_html=True)
-
-# Tampilkan Area Chart Streamlit
 chart_data = st.session_state['dd_history'].set_index('Waktu')
 st.area_chart(chart_data, color="#DEFF9A" if not st.session_state['emergency_triggered'] else "#FF5252")
 
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
-# 6. MODUL KONTROL DARURAT
+# 7. KONFIGURASI TELEGRAM BOT & MODUL KONTROL DARURAT
 # -----------------------------------------------------------------------------
-st.markdown('<h4 style="font-weight: 700; color: #FF5252; margin-bottom: 12px;">🚨 Modul Kontrol Darurat</h4>', unsafe_allow_html=True)
+st.markdown('<h4 style="font-weight: 700; color: #FF5252; margin-bottom: 12px;">🚨 Modul Kontrol Darurat & Alert</h4>', unsafe_allow_html=True)
+
+with st.expander("📲 Konfigurasi Notifikasi Telegram Bot"):
+    bot_token = st.text_input("Bot Token (dari BotFather):", type="password", key="tg_token")
+    chat_id = st.text_input("Chat ID / Group ID:", key="tg_chat")
 
 st.markdown("""
     <div class="emergency-card">
@@ -257,6 +274,21 @@ if st.button("🚨 CLOSE ALL POSITIONS (PANIC CUT-OFF)"):
     if pin_input == "8888":
         st.session_state['emergency_triggered'] = True
         st.error("⚠️ PERINTAH DARURAT DIEKSEKUSI! Seluruh posisi trading telah ditutup mutlak.")
+        
+        # Kirim Notifikasi Telegram Otomatis
+        msg = (
+            "🚨 *[EMERGENCY ALERT] ZF MASTER CORE APP*\n\n"
+            "⚠️ *PANIC CUT-OFF DIEKSEKUSI MANUSIA!*\n"
+            f"• Waktu: `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`\n"
+            f"• Total Ekuitas: `${current_equity:,.2f}`\n"
+            f"• Floating P/L Saat Cut-Off: `${floating_change:,.2f}`\n"
+            "• Status Robot: *DISCONNECTED / CLOSED ALL*"
+        )
+        if send_telegram_alert(bot_token, chat_id, msg):
+            st.success("📲 Notifikasi Darurat Berhasil Terkirim ke Telegram!")
+        else:
+            st.info("ℹ️ Notifikasi Telegram tidak terkirim (Token / Chat ID belum diisi).")
+            
     else:
         st.warning("❌ PIN Otorisasi Salah! Akses ditolak.")
 
