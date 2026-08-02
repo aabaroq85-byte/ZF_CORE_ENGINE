@@ -128,9 +128,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 2. STATE APPLIKASI & SIMULASI DATA
+# 2. STATE APLIKASI & SIMULASI DATA
 # -----------------------------------------------------------------------------
-if 'emergency_triggered' not in st_state:
+if 'emergency_triggered' not in st.session_state:
     st.session_state['emergency_triggered'] = False
 
 base_balance = 10000.00
@@ -229,14 +229,14 @@ pin_input = st.text_input("Masukkan PIN Otorisasi (Default PIN: 8888)", type="pa
 if st.button("🚨 CLOSE ALL POSITIONS (PANIC CUT-OFF)"):
     if pin_input == "8888":
         st.session_state['emergency_triggered'] = True
-        st.error("⚠️ PERINTAH DARURAT DIKESEKUSI! Seluruh posisi trading telah ditutup mutlak.")
+        st.error("⚠️ PERINTAH DARURAT DIEKSEKUSI! Seluruh posisi trading telah ditutup mutlak.")
     else:
         st.warning("❌ PIN Otorisasi Salah! Akses ditolak.")
 
 if st.session_state['emergency_triggered']:
     if st.button("🔄 RESET SISTEM MONITORING (NORMAL)"):
         st.session_state['emergency_triggered'] = False
-        st.experimental_rerun()
+        st.rerun()
 
 # Auto-refresh interval (jika kondisi normal)
 if not st.session_state['emergency_triggered']:
